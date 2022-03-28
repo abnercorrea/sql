@@ -7,22 +7,20 @@
 
 WITH monthly_revenue AS (
     SELECT
-        date_part('year', created_at) AS year,
-        date_part('month', created_at) AS month,
+        TO_CHAR(created_at, 'YYYY-MM') AS year_month,
         SUM(value) AS revenue
     FROM sf_transactions
-    GROUP BY year, month
+    GROUP BY year_month
 ),
 revenue_with_prev AS (
     SELECT
-        year,
-        month,
+        year_month,
         revenue,
-        LAG(revenue, 1) OVER (ORDER BY year, month) AS previous_revenue
+        LAG(revenue, 1) OVER (ORDER BY year_month) AS previous_revenue
     FROM monthly_revenue
 )
 SELECT
-    year || '-' || LPAD(month::text, 2, '0') AS year_month,
+    year_month,
     ROUND(100 * (revenue - previous_revenue) / previous_revenue, 2) AS revenue_change
 FROM revenue_with_prev
 ;
