@@ -7,7 +7,9 @@ with user_friends as (
     ) f
     group by user_id
 )
-select user_id, (friends / (select count(*) from user_friends)::float) * 100 popularity 
+select
+    user_id,
+    (friends / (select count(*) from user_friends)::float) * 100 popularity
 from user_friends
 order by user_id
 ;
